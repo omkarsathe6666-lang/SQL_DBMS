@@ -1,0 +1,65 @@
+SET SERVEROUTPUT ON;
+
+DECLARE
+    v_class VARCHAR2(30);  -- Declare variable once outside the loop
+BEGIN
+    -- STEP 1: Drop old tables if they exist
+    BEGIN
+        EXECUTE IMMEDIATE 'DROP TABLE Result';
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+
+    BEGIN
+        EXECUTE IMMEDIATE 'DROP TABLE Stud_Marks';
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+
+    -- STEP 2: Create Tables
+    EXECUTE IMMEDIATE 'CREATE TABLE Stud_Marks (
+                          Roll NUMBER PRIMARY KEY,
+                          Name VARCHAR2(50),
+                          Total_marks NUMBER
+                      )';
+
+    EXECUTE IMMEDIATE 'CREATE TABLE Result (
+                          Roll NUMBER,
+                          Name VARCHAR2(50),
+                          Class VARCHAR2(30)
+                      )';
+
+    -- STEP 3: Insert Sample Data
+    EXECUTE IMMEDIATE 'INSERT INTO Stud_Marks VALUES (1, ''Asmita'', 1450)';
+    EXECUTE IMMEDIATE 'INSERT INTO Stud_Marks VALUES (2, ''Neha'', 950)';
+    EXECUTE IMMEDIATE 'INSERT INTO Stud_Marks VALUES (3, ''Kiran'', 870)';
+    EXECUTE IMMEDIATE 'INSERT INTO Stud_Marks VALUES (4, ''Riya'', 700)';
+    COMMIT;
+
+    -- STEP 4: Process Each Student and Calculate Grade
+    DBMS_OUTPUT.PUT_LINE('ROLL | NAME   | CLASS');
+    DBMS_OUTPUT.PUT_LINE('---------------------------');
+
+    FOR rec IN (SELECT * FROM Stud_Marks ORDER BY Roll) LOOP
+        -- Calculate grade
+        IF rec.Total_marks BETWEEN 990 AND 1500 THEN
+            v_class := 'Distinction';
+        ELSIF rec.Total_marks BETWEEN 900 AND 989 THEN
+            v_class := 'First Class';
+        ELSIF rec.Total_marks BETWEEN 825 AND 899 THEN
+            v_class := 'Higher Second Class';
+        ELSE
+            v_class := 'Fail';
+        END IF;
+
+        -- Insert result into Result table
+        INSERT INTO Result (Roll, Name, Class)
+        VALUES (rec.Roll, rec.Name, v_class);
+
+        -- Print result using DBMS_OUTPUT
+        DBMS_OUTPUT.PUT_LINE(rec.Roll || '    | ' || rec.Name || ' | ' || v_class);
+    END LOOP;
+
+    COMMIT;
+
+    DBMS_OUTPUT.PUT_LINE('--- All Records Processed Successfully ---');
+END;
+/

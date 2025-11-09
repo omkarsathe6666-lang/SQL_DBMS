@@ -1,0 +1,68 @@
+SET SERVEROUTPUT ON;
+
+-- ✅ First Block: Create tables and insert data
+BEGIN
+    BEGIN
+        EXECUTE IMMEDIATE 'DROP TABLE N_RollCall PURGE';
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+
+    BEGIN
+        EXECUTE IMMEDIATE 'DROP TABLE O_RollCall PURGE';
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+
+    EXECUTE IMMEDIATE '
+        CREATE TABLE N_RollCall (
+            Roll_No NUMBER PRIMARY KEY,
+            Name VARCHAR2(50),
+            Dept VARCHAR2(30)
+        )';
+
+    EXECUTE IMMEDIATE '
+        CREATE TABLE O_RollCall (
+            Roll_No NUMBER PRIMARY KEY,
+            Name VARCHAR2(50),
+            Dept VARCHAR2(30)
+        )';
+
+    EXECUTE IMMEDIATE 'INSERT INTO N_RollCall VALUES (101, ''Asmita'', ''Computer'')';
+    EXECUTE IMMEDIATE 'INSERT INTO N_RollCall VALUES (102, ''Neha'', ''IT'')';
+    EXECUTE IMMEDIATE 'INSERT INTO N_RollCall VALUES (103, ''Rohan'', ''EXTC'')';
+    COMMIT;
+
+    DBMS_OUTPUT.PUT_LINE('Tables created and sample data inserted successfully.');
+END;
+/
+
+-- ✅ Second Block: Merge data
+DECLARE
+    v_rollno NUMBER;
+    v_name   VARCHAR2(50);
+    v_dept   VARCHAR2(30);
+    v_exists NUMBER;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('--- Starting Merge Process ---');
+
+    FOR rec IN (SELECT Roll_No, Name, Dept FROM N_RollCall) LOOP
+        v_rollno := rec.Roll_No;
+        v_name   := rec.Name;
+        v_dept   := rec.Dept;
+
+        SELECT COUNT(*) INTO v_exists
+        FROM O_RollCall
+        WHERE Roll_No = v_rollno;
+
+        IF v_exists = 0 THEN
+            INSERT INTO O_RollCall (Roll_No, Name, Dept)
+            VALUES (v_rollno, v_name, v_dept);
+            DBMS_OUTPUT.PUT_LINE('Inserted Roll No: ' || v_rollno || ' - ' || v_name);
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Skipped (Already Exists): Roll No ' || v_rollno);
+        END IF;
+    END LOOP;
+
+    DBMS_OUTPUT.PUT_LINE('--- Merge Completed Successfully ---');
+    COMMIT;
+END;
+/

@@ -1,0 +1,56 @@
+use AggregationExample;
+
+db.createCollection("Books");
+db.createCollection("Products");
+
+db.Books.insertMany([
+  { book_id: 1, book_title: "MongoDB Basics", author_name: "John Doe", publish_year: 2019 },
+  { book_id: 2, book_title: "Advanced MongoDB", author_name: "Jane Smith", publish_year: 2021 },
+  { book_id: 3, book_title: "NoSQL Concepts", author_name: "John Doe", publish_year: 2018 },
+  { book_id: 4, book_title: "Database Design", author_name: "Alice Ray", publish_year: 2023 }
+]);
+
+db.Products.insertMany([
+  { product_id: 1, name: "Laptop", price: 50000 },
+  { product_id: 2, name: "Mouse", price: 800 },
+  { product_id: 3, name: "Keyboard", price: 1200 },
+  { product_id: 4, name: "Monitor", price: 15000 },
+  { product_id: 5, name: "Printer", price: 8000 }
+]);
+
+// Create indexes
+db.Products.createIndex({ price: 1 });
+db.Books.createIndex({ author_name: 1, publish_year: -1 });
+
+// View all indexes
+db.Books.getIndexes();
+db.Products.getIndexes();
+
+// Drop price index
+db.Products.dropIndex({ price: 1 });
+
+// Aggregation examples
+db.Books.aggregate([
+  { $group: { _id: "$author_name", total_books: { $sum: 1 } } }
+]);
+
+db.Products.aggregate([
+  { $group: { _id: null, avg_price: { $avg: "$price" } } }
+]);
+
+db.Products.aggregate([
+  { $group: { _id: null, max_price: { $max: "$price" }, min_price: { $min: "$price" } } }
+]);
+
+db.Books.aggregate([
+  { $match: { publish_year: { $gt: 2015 } } },
+  { $count: "Books_After_2015" }
+]);
+
+db.Books.aggregate([
+  { $project: { _id: 0, book_title: 1, author_name: 1 } }
+]);
+
+db.Books.aggregate([
+  { $sort: { publish_year: 1 } }
+]);

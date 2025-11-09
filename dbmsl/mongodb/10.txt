@@ -1,0 +1,37 @@
+// Use database
+use MapReduceExample;
+
+// Create collection
+db.createCollection("Books");
+
+// Insert sample documents
+db.Books.insertMany([
+  { book_title: "MongoDB Basics", author_name: "John Doe", status: "active", publish_year: 2019 },
+  { book_title: "Advanced MongoDB", author_name: "John Doe", status: "active", publish_year: 2022 },
+  { book_title: "NoSQL Concepts", author_name: "Jane Smith", status: "passive", publish_year: 2020 },
+  { book_title: "Data Modeling", author_name: "Alice Ray", status: "active", publish_year: 2023 },
+  { book_title: "Database Design", author_name: "Jane Smith", status: "active", publish_year: 2021 },
+  { book_title: "Mongo in Practice", author_name: "John Doe", status: "active", publish_year: 2023 }
+]);
+
+// Map function: emit author name for active books
+var mapFunction = function() {
+  if (this.status === "active") {
+    emit(this.author_name, 1);
+  }
+};
+
+// Reduce function: count number of books per author
+var reduceFunction = function(key, values) {
+  return Array.sum(values);
+};
+
+// Run MapReduce
+db.Books.mapReduce(
+  mapFunction,
+  reduceFunction,
+  { out: "active_books_count" }
+);
+
+// View result
+db.active_books_count.find().pretty();

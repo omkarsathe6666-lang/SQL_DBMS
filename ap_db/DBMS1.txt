@@ -1,0 +1,204 @@
+DROP VIEW emp_company_view;
+DROP SYNONYM part_syn;
+DROP SYNONYM comp_syn;
+DROP INDEX emp_name_index;
+DROP INDEX part_driver_index;
+DROP SEQUENCE person_seq;
+DROP TABLE Manages CASCADE CONSTRAINTS;
+DROP TABLE Works CASCADE CONSTRAINTS;
+DROP TABLE Company CASCADE CONSTRAINTS;
+DROP TABLE Employee CASCADE CONSTRAINTS;
+DROP TABLE Participated CASCADE CONSTRAINTS;
+DROP TABLE Owns CASCADE CONSTRAINTS;
+DROP TABLE Accident CASCADE CONSTRAINTS;
+DROP TABLE Car CASCADE CONSTRAINTS;
+DROP TABLE Person CASCADE CONSTRAINTS;
+
+
+
+
+
+
+
+-- ******************************************************
+-- DBMS Practical: Demonstrating Tables, Views, Index, Sequence, Synonym
+-- ******************************************************
+
+------------------------------------------------------------
+-- 1. CREATE TABLES
+------------------------------------------------------------
+
+CREATE TABLE Person (
+    driver_id NUMBER PRIMARY KEY,
+    name VARCHAR2(30),
+    address VARCHAR2(50)
+);
+
+CREATE TABLE Car (
+    license VARCHAR2(15) PRIMARY KEY,
+    model VARCHAR2(20),
+    year NUMBER(4)
+);
+
+CREATE TABLE Accident (
+    report_no NUMBER PRIMARY KEY,
+    date_acc DATE,
+    location VARCHAR2(30)
+);
+
+CREATE TABLE Owns (
+    driver_id NUMBER,
+    license VARCHAR2(15),
+    PRIMARY KEY (driver_id, license),
+    FOREIGN KEY (driver_id) REFERENCES Person(driver_id),
+    FOREIGN KEY (license) REFERENCES Car(license)
+);
+
+CREATE TABLE Participated (
+    driver_id NUMBER,
+    model VARCHAR2(20),
+    report_no NUMBER,
+    damage_amount NUMBER(10,2),
+    PRIMARY KEY (driver_id, report_no),
+    FOREIGN KEY (driver_id) REFERENCES Person(driver_id),
+    FOREIGN KEY (report_no) REFERENCES Accident(report_no)
+);
+
+------------------------------------------------------------
+-- 2. SECOND SET OF TABLES
+------------------------------------------------------------
+
+CREATE TABLE Employee (
+    employee_name VARCHAR2(30) PRIMARY KEY,
+    street VARCHAR2(30),
+    city VARCHAR2(20)
+);
+
+CREATE TABLE Works (
+    employee_name VARCHAR2(30),
+    company_name VARCHAR2(30),
+    salary NUMBER(10,2),
+    PRIMARY KEY (employee_name, company_name),
+    FOREIGN KEY (employee_name) REFERENCES Employee(employee_name)
+);
+
+CREATE TABLE Company (
+    company_name VARCHAR2(30) PRIMARY KEY,
+    city VARCHAR2(20)
+);
+
+CREATE TABLE Manages (
+    employee_name VARCHAR2(30),
+    manager_name VARCHAR2(30),
+    PRIMARY KEY (employee_name, manager_name),
+    FOREIGN KEY (employee_name) REFERENCES Employee(employee_name)
+);
+
+------------------------------------------------------------
+-- 3. INSERT SAMPLE DATA
+------------------------------------------------------------
+
+-- Person Table using Sequence
+CREATE SEQUENCE person_seq START WITH 1 INCREMENT BY 1 NOCACHE;
+
+INSERT INTO Person (driver_id, name, address) VALUES (person_seq.NEXTVAL, 'Ravi', 'Pune');
+INSERT INTO Person (driver_id, name, address) VALUES (person_seq.NEXTVAL, 'Asmita', 'Lonavala');
+INSERT INTO Person (driver_id, name, address) VALUES (person_seq.NEXTVAL, 'Neha', 'Mumbai');
+INSERT INTO Person (driver_id, name, address) VALUES (person_seq.NEXTVAL, 'Rohan', 'Nashik');
+
+-- Car Table
+INSERT INTO Car VALUES ('MH12AB1234', 'Swift', 2020);
+INSERT INTO Car VALUES ('MH14CD5678', 'i20', 2021);
+INSERT INTO Car VALUES ('MH15EF9101', 'Baleno', 2019);
+
+-- Accident Table
+INSERT INTO Accident VALUES (101, TO_DATE('2024-03-15', 'YYYY-MM-DD'), 'Pune');
+INSERT INTO Accident VALUES (102, TO_DATE('2024-06-10', 'YYYY-MM-DD'), 'Mumbai');
+
+-- Owns Table
+INSERT INTO Owns VALUES (1, 'MH12AB1234');
+INSERT INTO Owns VALUES (2, 'MH14CD5678');
+INSERT INTO Owns VALUES (3, 'MH15EF9101');
+
+-- Participated Table
+INSERT INTO Participated VALUES (1, 'Swift', 101, 25000);
+INSERT INTO Participated VALUES (2, 'i20', 102, 18000);
+
+-- Employee Table
+INSERT INTO Employee VALUES ('Neha', 'FC Road', 'Pune');
+INSERT INTO Employee VALUES ('Asmita', 'MG Road', 'Lonavala');
+INSERT INTO Employee VALUES ('Ravi', 'Main Street', 'Mumbai');
+
+-- Company Table
+INSERT INTO Company VALUES ('Infosys', 'Pune');
+INSERT INTO Company VALUES ('TCS', 'Mumbai');
+
+-- Works Table
+INSERT INTO Works VALUES ('Neha', 'Infosys', 45000);
+INSERT INTO Works VALUES ('Asmita', 'TCS', 50000);
+INSERT INTO Works VALUES ('Ravi', 'Infosys', 40000);
+
+-- Manages Table
+INSERT INTO Manages VALUES ('Neha', 'Asmita');
+INSERT INTO Manages VALUES ('Asmita', 'Ravi');
+
+COMMIT;
+
+------------------------------------------------------------
+-- 4. CREATE VIEW
+------------------------------------------------------------
+
+CREATE VIEW emp_company_view AS
+SELECT w.employee_name, w.company_name
+FROM Works w;
+
+-- Display data from the view
+SELECT * FROM emp_company_view;
+
+------------------------------------------------------------
+-- 5. CREATE INDEX
+------------------------------------------------------------
+
+CREATE INDEX emp_name_index ON Employee(employee_name);
+CREATE INDEX part_driver_index ON Participated(driver_id);
+
+------------------------------------------------------------
+-- 6. CREATE SYNONYMS
+------------------------------------------------------------
+
+CREATE SYNONYM part_syn FOR Participated;
+CREATE SYNONYM comp_syn FOR Company;
+
+------------------------------------------------------------
+-- 7. DISPLAY RECORDS USING SYNONYMS
+------------------------------------------------------------
+
+SELECT * FROM part_syn;
+SELECT * FROM comp_syn;
+
+------------------------------------------------------------
+-- 8. UPDATE RECORD USING SYNONYM TABLE
+------------------------------------------------------------
+
+UPDATE part_syn SET damage_amount = 50000 WHERE driver_id = 1;
+UPDATE comp_syn SET city = 'Delhi' WHERE company_name = 'Infosys';
+
+COMMIT;
+
+------------------------------------------------------------
+-- 9. DISPLAY FINAL TABLES
+------------------------------------------------------------
+
+SELECT * FROM Person;
+SELECT * FROM Car;
+SELECT * FROM Accident;
+SELECT * FROM Owns;
+SELECT * FROM Participated;
+SELECT * FROM Employee;
+SELECT * FROM Works;
+SELECT * FROM Company;
+SELECT * FROM Manages;
+
+------------------------------------------------------------
+-- END OF SCRIPT
+------------------------------------------------------------

@@ -1,0 +1,50 @@
+// 1️⃣ Create / Switch to Database
+use Employee
+
+// 2️⃣ Create Collection
+db.createCollection("emp1")
+
+// 3️⃣ Insert 4–5 Documents into emp1
+db.emp1.insertMany([
+    { eno: 1, ename: "Asmita", address: "Lonavala", sal: 12000 },
+    { eno: 2, ename: "Neha", address: "Pune", sal: 8000 },
+    { eno: 3, ename: "Kiran", address: "Mumbai", sal: 18000 },
+    { eno: 4, ename: "Riya", address: "Nashik", sal: 4000 },
+    { eno: 5, ename: "Soham", address: "Satara", sal: 25000 }
+])
+
+// 4️⃣ Display All Documents
+db.emp1.find()
+
+// 5️⃣ Insert Document by Creating Own ObjectId
+db.emp1.insertOne({
+    _id: ObjectId("65a1122f1a2b3c4d5e6f7890"),
+    eno: 6,
+    ename: "Nikhil",
+    address: "Pune",
+    sal: 15000
+})
+
+// 6️⃣ Display Employees Having Salary Greater Than 5000
+db.emp1.find({ sal: { $gt: 5000 } })
+
+// 7️⃣ Display Employees Having Salary Less Than 15000
+db.emp1.find({ sal: { $lt: 15000 } })
+
+// 8️⃣ Display Employees Having Salary >10000 and <20000
+db.emp1.find({ sal: { $gt: 10000, $lt: 20000 } })
+
+// 9️⃣ Update Salary of All Employees with 10% Increase
+db.emp1.updateMany({}, { $mul: { sal: 1.10 } })
+
+// 🔟 Delete Employees Having Salary Less Than 5000
+db.emp1.deleteMany({ sal: { $lt: 5000 } })
+
+// 11️⃣ Rename Collection emp1 → employee1
+db.emp1.renameCollection("employee1")
+
+// 12️⃣ Display Employees Whose Name Starts with 'N'
+db.employee1.find({ ename: { $regex: /^N/i } })
+
+// 13️⃣ Sort Names in Ascending Order
+db.employee1.find().sort({ ename: 1 })

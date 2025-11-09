@@ -1,0 +1,56 @@
+SET SERVEROUTPUT ON;
+
+DECLARE
+    v_rollin Borrower.Rollin%TYPE;
+    v_book Borrower.NameofBook%TYPE;
+    v_dateofissue Borrower.DateofIssue%TYPE;
+    v_days NUMBER;
+    v_fine_amt NUMBER := 0;
+    v_status Borrower.Status%TYPE;
+BEGIN
+    -- Accept roll number and book name from user
+    v_rollin := &Rollin;
+    v_book := '&Name_of_Book';
+    
+    -- Get date of issue and status
+    SELECT DateofIssue, Status INTO v_dateofissue, v_status
+    FROM Borrower
+    WHERE Rollin = v_rollin AND NameofBook = v_book;
+    
+    -- Calculate days difference
+    v_days := TRUNC(SYSDATE - v_dateofissue);
+    
+    -- Fine calculation
+    IF v_days BETWEEN 15 AND 30 THEN
+        v_fine_amt := v_days * 5;
+    ELSIF v_days > 30 THEN
+        v_fine_amt := v_days * 50;
+    ELSE
+        v_fine_amt := 0;
+    END IF;
+    
+    -- Update book status to 'R'
+    UPDATE Borrower
+    SET Status = 'R'
+    WHERE Rollin = v_rollin AND NameofBook = v_book;
+    
+    -- Insert fine if applicable
+    IF v_fine_amt > 0 THEN
+        INSERT INTO Fine (Roll_no, Fine_Date, Amt)
+        VALUES (v_rollin, SYSDATE, v_fine_amt);
+        
+        DBMS_OUTPUT.PUT_LINE('Fine details added successfully!');
+        DBMS_OUTPUT.PUT_LINE('Fine Amount: Rs. ' || v_fine_amt);
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('No fine applicable.');
+    END IF;
+    
+    COMMIT;
+    
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('No record found for given Roll number and Book.');
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END;
+/

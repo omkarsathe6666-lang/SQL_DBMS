@@ -1,0 +1,97 @@
+-- ******************************************************
+-- Problem Statement: 02
+-- ******************************************************
+
+-- Drop old tables (ignore errors if they don’t exist)
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TABLE Employee CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+BEGIN
+  EXECUTE IMMEDIATE 'DROP TABLE Department CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+------------------------------------------------------------
+-- 1. CREATE TABLES
+------------------------------------------------------------
+
+CREATE TABLE Department (
+    Deptno NUMBER PRIMARY KEY,
+    Dname VARCHAR2(20) NOT NULL,
+    Location VARCHAR2(20)
+);
+
+CREATE TABLE Employee (
+    Empno NUMBER PRIMARY KEY,
+    Ename VARCHAR2(20) NOT NULL,
+    Job VARCHAR2(20),
+    Hiredate DATE,
+    Salary NUMBER(10,2),
+    Commission NUMBER(10,2),
+    Deptno NUMBER,
+    FOREIGN KEY (Deptno) REFERENCES Department(Deptno)
+);
+
+------------------------------------------------------------
+-- 2. INSERT DATA INTO TABLES
+------------------------------------------------------------
+
+-- Department records
+INSERT INTO Department VALUES (10, 'Accounts', 'Mumbai');
+INSERT INTO Department VALUES (20, 'Marketing', 'Pune');
+INSERT INTO Department VALUES (30, 'Sales', 'Nashik');
+INSERT INTO Department VALUES (40, 'Admin', 'Nagpur');
+
+-- Employee records
+INSERT INTO Employee VALUES (1001, 'Ravi', 'Clerk', TO_DATE('12-08-2020','DD-MM-YYYY'), 3500, NULL, 10);
+INSERT INTO Employee VALUES (1002, 'Asmita', 'Manager', TO_DATE('15-09-2019','DD-MM-YYYY'), 8000, 1500, 20);
+INSERT INTO Employee VALUES (1003, 'Neha', 'Analyst', TO_DATE('22-01-2021','DD-MM-YYYY'), 6000, NULL, 20);
+INSERT INTO Employee VALUES (1004, 'Rohan', 'Salesman', TO_DATE('17-03-2022','DD-MM-YYYY'), 4000, 500, 30);
+INSERT INTO Employee VALUES (1005, 'Pooja', 'Clerk', TO_DATE('05-07-2021','DD-MM-YYYY'), 3000, NULL, 10);
+INSERT INTO Employee VALUES (1006, 'Nikhil', 'Manager', TO_DATE('25-10-2018','DD-MM-YYYY'), 9000, 2000, 30);
+INSERT INTO Employee VALUES (1007, 'Gaurav', 'Analyst', TO_DATE('13-02-2020','DD-MM-YYYY'), 5500, NULL, 20);
+INSERT INTO Employee VALUES (1008, 'Sneha', 'Clerk', TO_DATE('20-04-2022','DD-MM-YYYY'), 2800, NULL, 40);
+
+COMMIT;
+
+------------------------------------------------------------
+-- 3. SQL QUERIES
+------------------------------------------------------------
+
+-- 1) Display employee information (rename column)
+SELECT Empno AS "Employee ID", Ename AS "Employee Name", Job, Salary FROM Employee;
+
+-- 2) Display unique jobs
+SELECT DISTINCT Job FROM Employee;
+
+-- 3) Change location of department 40 to 'Bangalore'
+UPDATE Department SET Location = 'Bangalore' WHERE Deptno = 40;
+
+-- 4) Delete employee 1003 (Neha)
+DELETE FROM Employee WHERE Empno = 1003;
+
+-- 5) Delete 'Pooja' record
+DELETE FROM Employee WHERE Ename = 'Pooja';
+
+-- 6) Display employees whose job title is 'Manager' or 'Analyst'
+SELECT * FROM Employee WHERE Job IN ('Manager', 'Analyst');
+
+-- 7) Display employee name and department number of employees in dept 10, 20, or 30
+SELECT Ename, Deptno FROM Employee WHERE Deptno IN (10,20,30);
+
+-- 8) Find all names of employees whose name starts with 'A'
+SELECT Ename FROM Employee WHERE Ename LIKE 'A%';
+
+-- 9) Find all names of employees having 'a' as second letter
+SELECT Ename FROM Employee WHERE Ename LIKE '_a%';
+
+-- 10) Find department number and maximum salary where max salary > 5000
+SELECT Deptno, MAX(Salary) AS Max_Salary
+FROM Employee
+GROUP BY Deptno
+HAVING MAX(Salary) > 5000;
+
+COMMIT;

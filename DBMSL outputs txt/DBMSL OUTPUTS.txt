@@ -1,0 +1,1019 @@
+DBMSL OUTPUTS
+
+
+Problem Statement: - 1
+Design and Develop SQL DDL statements which demonstrate the use of SQL objects such as Table, View, Index, Sequence, Synonym.
+
+1. Create the Tables
+
+-- Creating Person table
+CREATE TABLE Person (
+    driver_id NUMBER PRIMARY KEY,
+    name VARCHAR(50),
+    address VARCHAR(100)
+);
+
+-- Creating Car table
+CREATE TABLE Car (
+    license VARCHAR(15) PRIMARY KEY,
+    model VARCHAR(30),
+    year NUMBER
+);
+
+-- Creating Accident table
+CREATE TABLE Accident (
+    report_no NUMBER PRIMARY KEY,
+    date_acc DATE,
+    location VARCHAR(100)
+);
+
+-- Creating Owns table
+CREATE TABLE Owns (
+    driver_id NUMBER,
+    license VARCHAR(15),
+    PRIMARY KEY (driver_id, license),
+    FOREIGN KEY (driver_id) REFERENCES Person(driver_id),
+    FOREIGN KEY (license) REFERENCES Car(license)
+);
+
+-- Creating Participated table
+CREATE TABLE Participated (
+    driver_id NUMBER,
+    model VARCHAR(30),
+    report_no NUMBER,
+    damage_amount NUMBER,
+    PRIMARY KEY (driver_id, model, report_no),
+    FOREIGN KEY (driver_id) REFERENCES Person(driver_id),
+    FOREIGN KEY (report_no) REFERENCES Accident(report_no)
+);
+
+-- Creating Employee table
+CREATE TABLE Employee (
+    employee_name VARCHAR(50),
+    street VARCHAR(100),
+    city VARCHAR(50),
+    PRIMARY KEY (employee_name)
+);
+
+-- Creating Works table
+CREATE TABLE Works (
+    employee_name VARCHAR(50),
+    company_name VARCHAR(50),
+    salary NUMBER,
+    PRIMARY KEY (employee_name, company_name),
+    FOREIGN KEY (employee_name) REFERENCES Employee(employee_name)
+);
+
+-- Creating Company table
+CREATE TABLE Company (
+    company_name VARCHAR(50),
+    city VARCHAR(50),
+    PRIMARY KEY (company_name)
+);
+
+-- Creating Manages table
+CREATE TABLE Manages (
+    employee_name VARCHAR(50),
+    manager_name VARCHAR(50),
+    PRIMARY KEY (employee_name),
+    FOREIGN KEY (employee_name) REFERENCES Employee(employee_name)
+);
+
+2. Create a View with employee_name and company_name
+
+-- Creating a view to display employee_name and company_name
+CREATE VIEW Employee_Company_View AS
+SELECT employee_name, company_name
+FROM Works;
+
+3. Create Index for Employee and Participated tables
+
+-- Creating an index for Employee table on employee_name column
+CREATE INDEX idx_employee_name ON Employee(employee_name);
+
+-- Creating an index for Participated table on driver_id and report_no columns
+CREATE INDEX idx_participated ON Participated(driver_id, report_no);
+
+4. Create Sequence for Person table and Insert 4 Records
+
+-- Creating a sequence for Person table
+CREATE SEQUENCE person_seq
+START WITH 1
+INCREMENT BY 1;
+
+-- Inserting 4 records into Person using the sequence
+INSERT INTO Person (driver_id, name, address) VALUES (person_seq.NEXTVAL, 'John Doe', '123 Main St');
+INSERT INTO Person (driver_id, name, address) VALUES (person_seq.NEXTVAL, 'Jane Smith', '456 Oak Ave');
+INSERT INTO Person (driver_id, name, address) VALUES (person_seq.NEXTVAL, 'Michael Johnson', '789 Pine Rd');
+INSERT INTO Person (driver_id, name, address) VALUES (person_seq.NEXTVAL, 'Emily Davis', '321 Maple Blvd');
+
+5. Create Synonym for Participated and Company Tables and Update Records
+
+-- Creating synonym for the Participated table
+CREATE SYNONYM syn_participated FOR Participated;
+
+-- Creating synonym for the Company table
+CREATE SYNONYM syn_company FOR Company;
+
+-- Displaying records using the synonym
+SELECT * FROM syn_participated;
+SELECT * FROM syn_company;
+
+-- Updating a record using the synonym
+UPDATE syn_participated
+SET damage_amount = 2000
+WHERE driver_id = 1 AND report_no = 101;
+
+UPDATE syn_company
+SET city = 'New York'
+WHERE company_name = 'ABC Corp';
+
+
+Problem Statement: - 02
+Design at least 10 SQL queries for suitable database application using SQL DML statements: Insert, Select, Update, Delete with operators, functions, and set operator. 
+
+1. Table Creation for Department and Employee
+
+-- Creating Department table
+CREATE TABLE Department (
+    Deptno NUMBER PRIMARY KEY,
+    Dname VARCHAR(50) NOT NULL,
+    Location VARCHAR(50) NOT NULL
+);
+
+-- Inserting records into Department table
+INSERT INTO Department (Deptno, Dname, Location) VALUES (10, 'Accounting', 'Mumbai');
+INSERT INTO Department (Deptno, Dname, Location) VALUES (20, 'Research', 'Pune');
+INSERT INTO Department (Deptno, Dname, Location) VALUES (30, 'Sales', 'Nashik');
+INSERT INTO Department (Deptno, Dname, Location) VALUES (40, 'Operations', 'Nagpur');
+
+-- Creating Employee table
+CREATE TABLE Employee (
+    Empno NUMBER PRIMARY KEY,
+    Ename VARCHAR(50) NOT NULL,
+    Job VARCHAR(50),
+    Mgr NUMBER,
+    Joined_date DATE,
+    Salary NUMBER,
+    Commission NUMBER,
+    Deptno NUMBER,
+    Address VARCHAR(100),
+    FOREIGN KEY (Deptno) REFERENCES Department(Deptno)
+);
+
+-- Inserting records into Employee table
+INSERT INTO Employee (Empno, Ename, Job, Mgr, Joined_date, Salary, Commission, Deptno, Address)
+VALUES (1001, 'Nilesh Joshi', 'Clerk', 1005, TO_DATE('17-DEC-1995', 'DD-MON-YYYY'), 2800, 600, 20, 'Nashik');
+
+INSERT INTO Employee (Empno, Ename, Job, Mgr, Joined_date, Salary, Commission, Deptno, Address)
+VALUES (1002, 'Avinash Pawar', 'Salesman', 1003, TO_DATE('20-FEB-1996', 'DD-MON-YYYY'), 5000, 1200, 30, 'Nagpur');
+
+INSERT INTO Employee (Empno, Ename, Job, Mgr, Joined_date, Salary, Commission, Deptno, Address)
+VALUES (1003, 'Amit Kumar', 'Manager', 1004, TO_DATE('02-APR-1986', 'DD-MON-YYYY'), 2000, NULL, 30, 'Pune');
+
+INSERT INTO Employee (Empno, Ename, Job, Mgr, Joined_date, Salary, Commission, Deptno, Address)
+VALUES (1004, 'Nitin Kulkarni', 'President', NULL, TO_DATE('19-APR-1986', 'DD-MON-YYYY'), 50000, NULL, 10, 'Mumbai');
+
+INSERT INTO Employee (Empno, Ename, Job, Mgr, Joined_date, Salary, Commission, Deptno, Address)
+VALUES (1005, 'Niraj Sharma', 'Analyst', 1003, TO_DATE('03-DEC-1998', 'DD-MON-YYYY'), 12000, NULL, 20, 'Satara');
+
+INSERT INTO Employee (Empno, Ename, Job, Mgr, Joined_date, Salary, Commission, Deptno, Address)
+VALUES (1006, 'Pushkar Deshpande', 'Salesman', 1003, TO_DATE('01-SEP-1996', 'DD-MON-YYYY'), 6500, 1500, 30, 'Pune');
+
+INSERT INTO Employee (Empno, Ename, Job, Mgr, Joined_date, Salary, Commission, Deptno, Address)
+VALUES (1007, 'Sumit Patil', 'Manager', 1004, TO_DATE('01-MAY-1991', 'DD-MON-YYYY'), 25000, NULL, 20, 'Mumbai');
+
+INSERT INTO Employee (Empno, Ename, Job, Mgr, Joined_date, Salary, Commission, Deptno, Address)
+VALUES (1008, 'Ravi Sawant', 'Analyst', 1007, TO_DATE('17-NOV-1995', 'DD-MON-YYYY'), 10000, NULL, NULL, 'Amaravati');
+
+2. SQL Queries
+
+1. Display employee information (explicitly specifying column names)
+
+SELECT Empno AS "Employee Number", Ename AS "Employee Name", Job, Mgr AS "Manager", 
+       TO_CHAR(Joined_date, 'DD-MON-YYYY') AS "Joined Date", Salary, Commission, Deptno, Address 
+FROM Employee;
+
+2. Display unique jobs from the table
+
+SELECT DISTINCT Job FROM Employee;
+
+3. Change the location of department 40 to Bangalore
+
+UPDATE Department
+SET Location = 'Bangalore'
+WHERE Deptno = 40;
+
+4. Change the name of employee with Empno 1003 to 'Nikhil Gosavi'
+
+UPDATE Employee
+SET Ename = 'Nikhil Gosavi'
+WHERE Empno = 1003;
+
+5. Delete 'Pushkar Deshpande' from Employee table
+
+DELETE FROM Employee
+WHERE Ename = 'Pushkar Deshpande';
+
+6. Display employees whose job is either 'Manager' or 'Analyst' (using OR and IN)
+
+-- Using OR operator
+SELECT Ename, Job
+FROM Employee
+WHERE Job = 'Manager' OR Job = 'Analyst';
+
+-- Using IN operator
+SELECT Ename, Job
+FROM Employee
+WHERE Job IN ('Manager', 'Analyst');
+
+7. Display the employee name and department number of all employees in departments 10, 20, 30, and 40
+
+SELECT Ename, Deptno
+FROM Employee
+WHERE Deptno IN (10, 20, 30, 40);
+
+8. Find names and joined dates of employees whose names start with 'A'
+
+SELECT Ename, TO_CHAR(Joined_date, 'DD-MON-YYYY') AS "Joined Date"
+FROM Employee
+WHERE Ename LIKE 'A%';
+
+9. Find names of employees whose second letter is 'i'
+
+SELECT Ename
+FROM Employee
+WHERE Ename LIKE '_i%';
+
+10. Find the department number and maximum salary where the maximum salary is greater than 5000
+
+SELECT Deptno, MAX(Salary) AS "Max Salary"
+FROM Employee
+GROUP BY Deptno
+HAVING MAX(Salary) > 5000;
+
+
+Problem Statement: - 03
+Design at least 10 SQL queries for suitable database application using SQL DML statements: all types of Join, Sub-Query and View
+
+1. Table Creation
+
+-- Creating Employee table
+CREATE TABLE Employee (
+    employee_name VARCHAR(50) PRIMARY KEY,
+    street VARCHAR(100) NOT NULL,
+    city VARCHAR(50) NOT NULL
+);
+
+-- Creating Works table
+CREATE TABLE Works (
+    employee_name VARCHAR(50),
+    company_name VARCHAR(100),
+    salary NUMBER NOT NULL,
+    FOREIGN KEY (employee_name) REFERENCES Employee(employee_name)
+);
+
+-- Creating Company table
+CREATE TABLE Company (
+    company_name VARCHAR(100) PRIMARY KEY,
+    city VARCHAR(50)
+);
+
+-- Creating Manages table
+CREATE TABLE Manages (
+    employee_name VARCHAR(50),
+    manager_name VARCHAR(50),
+    FOREIGN KEY (employee_name) REFERENCES Employee(employee_name)
+);
+
+2. SQL Queries
+
+1. Find the names of employees who work for 'First Bank Corporation'
+
+SELECT employee_name
+FROM Works
+WHERE company_name = 'First Bank Corporation';
+
+2. Find the names and cities of residence of all employees who work for 'First Bank Corporation'
+
+SELECT E.employee_name, E.city
+FROM Employee E
+JOIN Works W ON E.employee_name = W.employee_name
+WHERE W.company_name = 'First Bank Corporation';
+
+3. Find the names, street addresses, and cities of residence of all employees who work for 'First Bank Corporation' and earn more than $10,000
+
+SELECT E.employee_name, E.street, E.city
+FROM Employee E
+JOIN Works W ON E.employee_name = W.employee_name
+WHERE W.company_name = 'First Bank Corporation' 
+  AND W.salary > 10000;
+
+4. Find all employees in the database who earn more than each employee of 'Small Bank Corporation'
+
+SELECT employee_name
+FROM Works
+WHERE salary > ALL (SELECT salary 
+                    FROM Works 
+                    WHERE company_name = 'Small Bank Corporation');
+
+5. Find all employees who earn more than the average salary of all employees of their companies
+
+SELECT W.employee_name, W.company_name, W.salary
+FROM Works W
+WHERE W.salary > (SELECT AVG(W2.salary)
+                  FROM Works W2
+                  WHERE W2.company_name = W.company_name);
+
+6. Find the company that has the smallest payroll
+
+SELECT company_name
+FROM Works
+GROUP BY company_name
+ORDER BY SUM(salary) ASC
+FETCH FIRST 1 ROWS ONLY;
+
+7. Find those companies whose employees earn a higher salary, on average, than the average salary at 'First Bank Corporation'
+
+SELECT W.company_name
+FROM Works W
+GROUP BY W.company_name
+HAVING AVG(W.salary) > (SELECT AVG(salary)
+                        FROM Works
+                        WHERE company_name = 'First Bank Corporation');
+
+8. Give all employees of 'First Bank Corporation' a 10% raise
+
+UPDATE Works
+SET salary = salary * 1.10
+WHERE company_name = 'First Bank Corporation';
+
+9. Insert the names and salaries of employees who earn more than the average salary into a new table called HighEarners
+
+-- Creating HighEarners table
+CREATE TABLE HighEarners (
+    employee_name VARCHAR(50),
+    salary NUMBER
+);
+
+-- Inserting high earners
+INSERT INTO HighEarners (employee_name, salary)
+SELECT W.employee_name, W.salary
+FROM Works W
+WHERE W.salary > (SELECT AVG(salary) FROM Works);
+
+10. Delete employees from the Employee table who work for a company located in 'Gotham'
+
+DELETE FROM Employee
+WHERE employee_name IN (SELECT W.employee_name
+                        FROM Works W
+                        JOIN Company C ON W.company_name = C.company_name
+                        WHERE C.city = 'Gotham');
+
+
+Problem Statement: - 04
+Unnamed PL/SQL code block: Use of Control structure and Exception handling is mandatory.
+
+DECLARE
+    -- Variables to store user input
+    v_roll_no   borrower.rollin%TYPE;
+    v_book_name borrower.nameofbook%TYPE;
+
+    -- Variables to store data from database
+    v_date_of_issue borrower.dateofissue%TYPE;
+    v_status borrower.status%TYPE;
+
+    -- Variables for calculating fine and days
+    v_fine_amt    fine.amt%TYPE;
+    v_days_issued NUMBER;
+    v_sysdate     DATE := SYSDATE;
+
+    -- Exception handling variables
+    e_book_not_found EXCEPTION;
+    e_no_rows EXCEPTION;
+    PRAGMA EXCEPTION_INIT(e_no_rows, -01403);
+
+BEGIN
+    -- Accepting user input
+    v_roll_no := &roll_no;
+    v_book_name := '&book_name';
+
+    -- Fetch the date of issue and status for the given roll_no and book name
+    SELECT dateofissue, status
+    INTO v_date_of_issue, v_status
+    FROM borrower
+    WHERE rollin = v_roll_no
+      AND nameofbook = v_book_name;
+
+    -- Calculate the number of days since the book was issued
+    v_days_issued := v_sysdate - v_date_of_issue;
+
+    -- Initialize fine amount to 0
+    v_fine_amt := 0;
+
+    -- Check the number of days to calculate the fine amount
+    IF v_days_issued > 15 THEN
+        IF v_days_issued <= 30 THEN
+            v_fine_amt := (v_days_issued - 15) * 5; -- Rs. 5 per day for 15 to 30 days
+        ELSE
+            v_fine_amt := (v_days_issued - 30) * 50 + (15 * 5); -- Rs. 50 per day after 30 days
+        END IF;
+    END IF;
+
+    -- If the status is 'I', change it to 'R' for Returned
+    IF v_status = 'I' THEN
+        UPDATE borrower
+        SET status = 'R'
+        WHERE rollin = v_roll_no
+          AND nameofbook = v_book_name;
+    ELSE
+        RAISE e_book_not_found;
+    END IF;
+
+    -- Insert into the Fine table if a fine was calculated
+    IF v_fine_amt > 0 THEN
+        INSERT INTO fine (roll_no, date, amt)
+        VALUES (v_roll_no, SYSDATE, v_fine_amt);
+    END IF;
+
+    -- Display the result
+    DBMS_OUTPUT.PUT_LINE('Fine calculated for Roll No: ' || v_roll_no || ' is: Rs. ' || v_fine_amt);
+
+EXCEPTION
+    -- Handle no rows found for the given roll_no and book name
+    WHEN e_no_rows THEN
+        DBMS_OUTPUT.PUT_LINE('No record found for Roll No: ' || v_roll_no || ' and Book: ' || v_book_name);
+
+    -- Handle case when the book is not issued
+    WHEN e_book_not_found THEN
+        DBMS_OUTPUT.PUT_LINE('Book has not been issued or already returned.');
+
+    -- Handle any other errors
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END;
+
+
+Problem Statement: - 05
+Cursors: (All types: Implicit, Explicit, Cursor FOR Loop, Parameterized Cursor) 
+
+DECLARE
+    -- Declare a parameterized cursor to fetch data from N_RollCall
+    CURSOR new_rollcall_cur(p_roll_no N_RollCall.roll_no%TYPE) IS
+        SELECT roll_no, student_name, subject, attendance_status
+        FROM N_RollCall
+        WHERE roll_no = p_roll_no;
+
+    -- Variables to hold the fetched data
+    v_roll_no         O_RollCall.roll_no%TYPE;
+    v_student_name    O_RollCall.student_name%TYPE;
+    v_subject         O_RollCall.subject%TYPE;
+    v_attendance      O_RollCall.attendance_status%TYPE;
+
+    -- Check if the record exists in O_RollCall
+    v_count           NUMBER;
+    
+BEGIN
+    -- Loop through all records in N_RollCall
+    FOR rec IN (SELECT roll_no FROM N_RollCall) LOOP
+        -- Open the parameterized cursor for each roll_no
+        OPEN new_rollcall_cur(rec.roll_no);
+        
+        -- Fetch the data from N_RollCall using the cursor
+        FETCH new_rollcall_cur INTO v_roll_no, v_student_name, v_subject, v_attendance;
+        
+        -- Check if the roll number already exists in O_RollCall
+        SELECT COUNT(*)
+        INTO v_count
+        FROM O_RollCall
+        WHERE roll_no = v_roll_no;
+        
+        -- If record does not exist in O_RollCall, insert it
+        IF v_count = 0 THEN
+            INSERT INTO O_RollCall (roll_no, student_name, subject, attendance_status)
+            VALUES (v_roll_no, v_student_name, v_subject, v_attendance);
+            DBMS_OUTPUT.PUT_LINE('Inserted roll no: ' || v_roll_no);
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Skipped roll no: ' || v_roll_no || ' (already exists)');
+        END IF;
+        
+        -- Close the cursor
+        CLOSE new_rollcall_cur;
+    END LOOP;
+    
+    -- Commit the changes
+    COMMIT;
+    
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error occurred: ' || SQLERRM);
+        ROLLBACK;
+END;
+
+1. Implicit Cursor:
+
+BEGIN
+    UPDATE O_RollCall
+    SET attendance_status = 'Present'
+    WHERE attendance_status = 'Absent';
+    
+    DBMS_OUTPUT.PUT_LINE('Updated all absentees to present.');
+END;
+
+2. Explicit Cursor:
+
+DECLARE
+    CURSOR math_students_cur IS
+        SELECT roll_no, student_name FROM O_RollCall WHERE subject = 'Mathematics';
+
+    v_roll_no       O_RollCall.roll_no%TYPE;
+    v_student_name  O_RollCall.student_name%TYPE;
+
+BEGIN
+    OPEN math_students_cur;
+    
+    LOOP
+        FETCH math_students_cur INTO v_roll_no, v_student_name;
+        EXIT WHEN math_students_cur%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('Roll No: ' || v_roll_no || ', Name: ' || v_student_name);
+    END LOOP;
+    
+    CLOSE math_students_cur;
+END;
+
+3. Cursor FOR Loop:
+
+BEGIN
+    FOR rec IN (SELECT student_name, subject FROM O_RollCall) LOOP
+        DBMS_OUTPUT.PUT_LINE('Student: ' || rec.student_name || ', Subject: ' || rec.subject);
+    END LOOP;
+END;
+
+
+Problem Statement: - 06
+Write a Stored Procedure namely proc_Grade for the categorization of student.
+ If marks scored by students in examination is  <=1500 and marks>=990 then student will be placed in Distinction category
+ if marks scored are between 989 and 900 category is First Class,
+ if marks 899 and 825 category is Higher Second Class. 
+
+PL/SQL Stored Procedure
+
+CREATE OR REPLACE PROCEDURE proc_Grade (
+    p_roll IN Stud_Marks.Roll%TYPE,
+    p_name IN Stud_Marks.Name%TYPE,
+    p_total_marks IN Stud_Marks.Total_marks%TYPE
+) IS
+    v_class VARCHAR2(20);
+BEGIN
+    -- Categorizing based on marks
+    IF p_total_marks BETWEEN 990 AND 1500 THEN
+        v_class := 'Distinction';
+    ELSIF p_total_marks BETWEEN 900 AND 989 THEN
+        v_class := 'First Class';
+    ELSIF p_total_marks BETWEEN 825 AND 899 THEN
+        v_class := 'Higher Second Class';
+    ELSE
+        v_class := 'Not Qualified'; -- Default case for marks below 825
+    END IF;
+
+    -- Insert the categorized result into Result table
+    INSERT INTO Result (Roll, Name, Class)
+    VALUES (p_roll, p_name, v_class);
+
+    DBMS_OUTPUT.PUT_LINE('Roll: ' || p_roll || ' | Name: ' || p_name || ' | Class: ' || v_class);
+
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error occurred: ' || SQLERRM);
+END proc_Grade;
+
+PL/SQL Block to Call the Stored Procedure
+
+BEGIN
+    FOR student IN (SELECT Roll, Name, Total_marks FROM Stud_Marks) LOOP
+        -- Call the procedure for each student
+        proc_Grade(student.Roll, student.Name, student.Total_marks);
+    END LOOP;
+    
+    -- Commit the transaction
+    COMMIT;
+END;
+
+Problem Statement for Writing PL/SQL Stored Procedure and Function:
+
+CREATE OR REPLACE FUNCTION get_student_grade(p_roll IN Stud_Marks.Roll%TYPE) 
+RETURN VARCHAR2
+IS
+    v_total_marks Stud_Marks.Total_marks%TYPE;
+    v_grade VARCHAR2(20);
+BEGIN
+    -- Fetch total marks of the student
+    SELECT Total_marks INTO v_total_marks FROM Stud_Marks WHERE Roll = p_roll;
+    
+    -- Categorize based on marks
+    IF v_total_marks BETWEEN 990 AND 1500 THEN
+        v_grade := 'Distinction';
+    ELSIF v_total_marks BETWEEN 900 AND 989 THEN
+        v_grade := 'First Class';
+    ELSIF v_total_marks BETWEEN 825 AND 899 THEN
+        v_grade := 'Higher Second Class';
+    ELSE
+        v_grade := 'Not Qualified';
+    END IF;
+    
+    RETURN v_grade;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN 'Error occurred';
+END get_student_grade;
+
+
+Problem Statement: - 07
+Database Trigger (All Types: Row level and Statement level triggers, Before and After Triggers). 
+
+Example of Row-Level Trigger for Before Update
+
+CREATE OR REPLACE TRIGGER before_update_library
+BEFORE UPDATE ON Library
+FOR EACH ROW
+BEGIN
+    -- Insert old values into Library_Audit before the update
+    INSERT INTO Library_Audit (Audit_ID, Book_ID, Old_Title, Old_Author, Old_Publisher, Old_Year_Published, Operation_Type, Timestamp)
+    VALUES (Library_Audit_seq.NEXTVAL, :OLD.Book_ID, :OLD.Title, :OLD.Author, :OLD.Publisher, :OLD.Year_Published, 'UPDATE', SYSDATE);
+END;
+
+Example of Row-Level Trigger for After Delete
+
+CREATE OR REPLACE TRIGGER after_delete_library
+AFTER DELETE ON Library
+FOR EACH ROW
+BEGIN
+    -- Insert old values into Library_Audit after the delete
+    INSERT INTO Library_Audit (Audit_ID, Book_ID, Old_Title, Old_Author, Old_Publisher, Old_Year_Published, Operation_Type, Timestamp)
+    VALUES (Library_Audit_seq.NEXTVAL, :OLD.Book_ID, :OLD.Title, :OLD.Author, :OLD.Publisher, :OLD.Year_Published, 'DELETE', SYSDATE);
+END;
+
+Example of Statement-Level Trigger for Before Delete
+
+CREATE OR REPLACE TRIGGER before_delete_library_statement
+BEFORE DELETE ON Library
+BEGIN
+    -- Log a message before a bulk delete operation
+    DBMS_OUTPUT.PUT_LINE('A DELETE operation is about to be executed on the Library table.');
+END;
+
+Example of Statement-Level Trigger for After Update
+
+CREATE OR REPLACE TRIGGER after_update_library_statement
+AFTER UPDATE ON Library
+BEGIN
+    -- Log a message after the update operation is completed
+    DBMS_OUTPUT.PUT_LINE('Records have been updated in the Library table.');
+END;
+
+
+Problem Statement: - 08
+Design and Develop MongoDB Queries using CRUD operations. (Use CRUD operations, SAVE method, logical operators)
+
+MongoDB Queries
+
+1. Create Database Employee:
+
+use Employee;
+
+2. Create Collection emp1:
+
+db.createCollection("emp1");
+
+3. Insert Documents:
+
+db.emp1.insertMany([
+    { eno: 1001, ename: "Nilesh Joshi", address: "Nashik", sal: 8000 },
+    { eno: 1002, ename: "Avinash Pawar", address: "Nagpur", sal: 12000 },
+    { eno: 1003, ename: "Amit Kumar", address: "Pune", sal: 18000 },
+    { eno: 1004, ename: "Nikhil Gosavi", address: "Mumbai", sal: 15000 }
+]);
+
+4. Display All Documents:
+
+db.emp1.find().pretty();
+
+5. Insert Document with Custom Object ID:
+
+db.emp1.insertOne({
+    _id: ObjectId("609d2f9e5f3a4f1b9c4e928a"),
+    eno: 1005,
+    ename: "Ravi Sawant",
+    address: "Satara",
+    sal: 10000
+});
+
+6. Display Employees with Salary > 5000:
+
+db.emp1.find({ sal: { $gt: 5000 } }).pretty();
+
+7. Display Employees with Salary < 15000:
+
+db.emp1.find({ sal: { $lt: 15000 } }).pretty();
+
+8. Display Employees with Salary between 10000 and 20000:
+
+db.emp1.find({ sal: { $gt: 10000, $lt: 20000 } }).pretty();
+
+9. Update Salary by 10% for All Employees:
+
+db.emp1.updateMany({}, { $mul: { sal: 1.10 } });
+
+10. Delete Employees with Salary < 5000:
+
+db.emp1.deleteMany({ sal: { $lt: 5000 } });
+
+11. Rename Collection emp1 to employee1:
+
+db.emp1.renameCollection("employee1");
+
+12. Display Employees whose Name Starts with "n":
+
+db.employee1.find({ ename: { $regex: /^n/i } }).pretty();
+
+13. Sort Employee Names in Ascending Order:
+
+db.employee1.find().sort({ ename: 1 }).pretty();
+
+
+Problem Statement: - 09
+Implement aggregation and indexing with suitable example using MongoDB.
+
+MongoDB Queries
+
+1. Create Index on price Field in Products Collection:
+
+db.Products.createIndex({ price: 1 });
+
+2. Create Compound Index on author_name and publish_year in Books Collection:
+
+db.Books.createIndex({ author_name: 1, publish_year: 1 });
+
+3. View All Indexes in Books and Products Collections:
+
+View indexes in Books:
+
+db.Books.getIndexes();
+
+View indexes in Products:
+
+db.Products.getIndexes();
+
+4. Drop Index on price Field in Products Collection:
+
+db.Products.dropIndex({ price: 1 });
+
+5. Count Number of Books Published by Each Author:
+
+db.Books.aggregate([
+    {
+        $group: {
+            _id: "$author_name",
+            total_books: { $sum: 1 }
+        }
+    }
+]);
+
+6. Calculate Average Price of All Products:
+
+db.Products.aggregate([
+    {
+        $group: {
+            _id: null,
+            avg_price: { $avg: "$price" }
+        }
+    }
+]);
+
+7. Find Maximum and Minimum Price in Products Collection:
+
+db.Products.aggregate([
+    {
+        $group: {
+            _id: null,
+            max_price: { $max: "$price" },
+            min_price: { $min: "$price" }
+        }
+    }
+]);
+
+8. Count Number of Books Published After 2015:
+
+db.Books.aggregate([
+    {
+        $match: {
+            publish_year: { $gt: 2015 }
+        }
+    },
+    {
+        $count: "total_books"
+    }
+]);
+
+9. Display Only book_title and author_name Fields from Books:
+
+db.Books.aggregate([
+    {
+        $project: {
+            _id: 0,
+            book_title: 1,
+            author_name: 1
+        }
+    }
+]);
+
+10. Sort Documents in Books Collection:
+
+Sort by publish_year in ascending order:
+
+db.Books.find().sort({ publish_year: 1 });
+
+Sort by author_name in descending order:
+
+db.Books.find().sort({ author_name: -1 });
+
+
+Problem Statement: - 10
+Implement Map reduces operation with suitable example using MongoDB
+
+
+MongoDB MapReduce Implementation
+
+Step 1: Sample Document Structure (Book Collection)
+
+db.Books.insertMany([
+   { book_title: "Book A", author_name: "Author 1", status: "active", publish_year: 2020 },
+   { book_title: "Book B", author_name: "Author 1", status: "passive", publish_year: 2018 },
+   { book_title: "Book C", author_name: "Author 2", status: "active", publish_year: 2021 },
+   { book_title: "Book D", author_name: "Author 3", status: "active", publish_year: 2019 },
+   { book_title: "Book E", author_name: "Author 2", status: "passive", publish_year: 2017 },
+   { book_title: "Book F", author_name: "Author 1", status: "active", publish_year: 2022 }
+]);
+
+Step 2: Define the Map Function
+
+var mapFunction = function() {
+   if (this.status === "active") {
+      emit(this.author_name, 1);
+   }
+};
+
+Step 3: Define the Reduce Function
+
+var reduceFunction = function(author, countArray) {
+   return Array.sum(countArray);
+};
+
+Step 4: Execute the MapReduce Operation
+
+db.Books.mapReduce(
+   mapFunction,
+   reduceFunction,
+   {
+      out: "active_books_count" // Store result in a new collection
+   }
+);
+
+Step 5: Query the Result
+
+db.active_books_count.find();
+
+
+Problem Statement: - 11
+Design and Implement 10 query using MongoDB
+
+Step 1: Create Database and Collection
+
+1. Create Database:
+
+use Restaurants;
+
+2. Create Collection REST1:
+
+db.createCollection("REST1");
+
+Step 2: Insert Documents
+
+Insert Documents:
+
+db.REST1.insertMany([
+    { restaurant_id: 3001, name: "Spice Garden", address: { building: "10A", street: "Main St", city: "Mumbai", zipcode: "400001" }, cuisine_type: "Indian", score: 85 },
+    { restaurant_id: 3002, name: "Pasta Palace", address: { building: "5B", street: "Second St", city: "Mumbai", zipcode: "400002" }, cuisine_type: "Italian", score: 78 },
+    { restaurant_id: 3003, name: "Sushi Spot", address: { building: "12C", street: "Third St", city: "Mumbai", zipcode: "400003" }, cuisine_type: "Japanese", score: 90 },
+    { restaurant_id: 3004, name: "Taco Haven", address: { building: "20D", street: "Fourth St", city: "Mumbai", zipcode: "400004" }, cuisine_type: "Mexican", score: 88 },
+    { restaurant_id: 3005, name: "Curry House", address: { building: "30E", street: "Fifth St", city: "Mumbai", zipcode: "400005" }, cuisine_type: "Indian", score: 92 }
+]);
+
+Step 3: MongoDB Queries
+
+4. Display All Documents:
+
+db.REST1.find().pretty();
+
+5. Display Specific Fields, Excluding _id:
+
+db.REST1.find({}, { _id: 0, restaurant_id: 1, name: 1, "address.city": 1, "address.zipcode": 1 });
+
+6. Find Restaurants with Score Between 80 and 100:
+
+db.REST1.find({ score: { $gt: 80, $lt: 100 } }).pretty();
+
+7. Update Score of Restaurant with ID 3001:
+
+db.REST1.updateOne({ restaurant_id: 3001 }, { $set: { score: 90 } });
+
+8. Update Cuisine Type of All Indian Restaurants:
+
+db.REST1.updateMany({ cuisine_type: "Indian" }, { $set: { cuisine_type: "Indian_Zatka" } });
+
+9. Delete Restaurant with ID 3003:
+
+db.REST1.deleteOne({ restaurant_id: 3003 });
+
+10. Delete All Restaurants with Score Less Than 85:
+
+db.REST1.deleteMany({ score: { $lt: 85 } });
+
+
+Problem Statement: - 12
+Design and Implement 10 query using MongoDB
+
+Step 1: Create Database and Collection
+
+1. Create Database:
+
+use School;
+
+2. Create Collection Student:
+
+db.createCollection("Student");
+
+Step 2: Insert Documents
+
+3. Insert Documents:
+
+db.Student.insertMany([
+    { student_id: 101, name: "Alice", age: 19, gender: "Female", marks: { math: 95, science: 88, english: 78 } },
+    { student_id: 102, name: "Bob", age: 21, gender: "Male", marks: { math: 85, science: 92, english: 81 } },
+    { student_id: 103, name: "Charlie", age: 22, gender: "Male", marks: { math: 76, science: 70, english: 90 } },
+    { student_id: 104, name: "Diana", age: 20, gender: "Female", marks: { math: 88, science: 91, english: 86 } },
+    { student_id: 105, name: "Eve", age: 18, gender: "Female", marks: { math: 67, science: 72, english: 80 } },
+    { student_id: 106, name: "Frank", age: 23, gender: "Male", marks: { math: 92, science: 85, english: 90 } }
+]);
+
+Step 3: MongoDB Queries
+
+4. Find All Male Students:
+
+db.Student.find({ gender: "Male" }).pretty();
+
+5. Find Students Who Scored More Than 90 in Math:
+
+db.Student.find({ "marks.math": { $gt: 90 } }).pretty();
+
+6. Find Students Aged 20 and Above:
+
+db.Student.find({ age: { $gte: 20 } }).pretty();
+
+7. Find Students Whose English Marks Are Between 80 and 90:
+
+db.Student.find({ "marks.english": { $gte: 80, $lte: 90 } }).pretty();
+
+8. Count the Number of Female Students:
+
+db.Student.countDocuments({ gender: "Female" });
+
+9. Find the Student with the Highest Science Score:
+
+db.Student.find().sort({ "marks.science": -1 }).limit(1);
+
+10. Update Bob’s Math Score to 75:
+
+db.Student.updateOne({ name: "Bob" }, { $set: { "marks.math": 75 } });
+
+11. Delete All Students Who Scored Below 70 in Math:
+
+db.Student.deleteMany({ "marks.math": { $lt: 70 } });
+
+12. Use Aggregation to Find the Average Marks in Science for All Students:
+
+db.Student.aggregate([
+    { $group: { _id: null, averageScience: { $avg: "$marks.science" } } }
+]);
+
+13. Find the Number of Students with Marks Greater Than 80 in Any Subject:
+
+db.Student.find({
+    $or: [
+        { "marks.math": { $gt: 80 } },
+        { "marks.science": { $gt: 80 } },
+        { "marks.english": { $gt: 80 } }
+    ]
+}).count();
+
+

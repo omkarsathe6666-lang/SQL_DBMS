@@ -1,0 +1,86 @@
+//-----------------------------------------
+// 🔹 Problem Statement 09: Aggregation & Indexing in MongoDB
+//-----------------------------------------
+
+// 1️⃣ Create Database
+use LibraryDB
+
+// 2️⃣ Create Collections: Books and Products
+db.createCollection("Books")
+db.createCollection("Products")
+
+// 3️⃣ Insert Sample Documents into Books
+db.Books.insertMany([
+    { book_id: 1, book_title: "MongoDB Basics", author_name: "John Doe", publish_year: 2014 },
+    { book_id: 2, book_title: "Advanced MongoDB", author_name: "John Doe", publish_year: 2018 },
+    { book_id: 3, book_title: "NoSQL for Beginners", author_name: "Alice Smith", publish_year: 2019 },
+    { book_id: 4, book_title: "Data Science with MongoDB", author_name: "Bob Martin", publish_year: 2021 },
+    { book_id: 5, book_title: "Database Design", author_name: "Alice Smith", publish_year: 2013 }
+])
+
+// 4️⃣ Insert Sample Documents into Products
+db.Products.insertMany([
+    { product_id: 1, name: "Notebook", price: 50 },
+    { product_id: 2, name: "Pen", price: 20 },
+    { product_id: 3, name: "Book Stand", price: 250 },
+    { product_id: 4, name: "Lamp", price: 800 },
+    { product_id: 5, name: "Table", price: 1200 }
+])
+
+// 5️⃣ Create an Index on price field in Products
+db.Products.createIndex({ price: 1 })
+
+// 6️⃣ Create a Compound Index on author_name and publish_year in Books
+db.Books.createIndex({ author_name: 1, publish_year: -1 })
+
+// 7️⃣ View All Indexes in Books & Products
+db.Books.getIndexes()
+db.Products.getIndexes()
+
+// 8️⃣ Drop the Index Created on price Field in Products
+db.Products.dropIndex("price_1")
+
+// 9️⃣ Aggregation: Total Number of Books Published by Each Author
+db.Books.aggregate([
+    {
+        $group: {
+            _id: "$author_name",
+            total_books: { $sum: 1 }
+        }
+    }
+])
+
+// 🔟 Aggregation: Average Price of All Products
+db.Products.aggregate([
+    {
+        $group: {
+            _id: null,
+            avg_price: { $avg: "$price" }
+        }
+    }
+])
+
+// 11️⃣ Aggregation: Maximum and Minimum Price in Products
+db.Products.aggregate([
+    {
+        $group: {
+            _id: null,
+            max_price: { $max: "$price" },
+            min_price: { $min: "$price" }
+        }
+    }
+])
+
+// 12️⃣ Aggregation: Count Books Where publish_year > 2015
+db.Books.aggregate([
+    { $match: { publish_year: { $gt: 2015 } } },
+    { $count: "Books_Published_After_2015" }
+])
+
+// 13️⃣ Aggregation: Project Only book_title and author_name from Books
+db.Books.aggregate([
+    { $project: { _id: 0, book_title: 1, author_name: 1 } }
+])
+
+// 14️⃣ Sort Books by publish_year (Descending)
+db.Books.find().sort({ publish_year: -1 })

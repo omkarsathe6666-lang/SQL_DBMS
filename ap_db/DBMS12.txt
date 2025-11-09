@@ -1,0 +1,119 @@
+//-----------------------------------------
+// 1️⃣ Create / Switch to Database
+//-----------------------------------------
+use CollegeDB
+
+//-----------------------------------------
+// 2️⃣ Create Collection: Student
+//-----------------------------------------
+db.createCollection("Student")
+
+//-----------------------------------------
+// 3️⃣ Insert Sample Documents
+//-----------------------------------------
+db.Student.insertOne({
+  student_id: 1,
+  name: "Alice",
+  age: 19,
+  gender: "Female",
+  marks: { math: 85, science: 92, english: 88 }
+})
+
+db.Student.insertOne({
+  student_id: 2,
+  name: "Bob",
+  age: 21,
+  gender: "Male",
+  marks: { math: 65, science: 78, english: 72 }
+})
+
+db.Student.insertOne({
+  student_id: 3,
+  name: "Charlie",
+  age: 20,
+  gender: "Male",
+  marks: { math: 95, science: 89, english: 84 }
+})
+
+db.Student.insertOne({
+  student_id: 4,
+  name: "Diana",
+  age: 22,
+  gender: "Female",
+  marks: { math: 91, science: 95, english: 90 }
+})
+
+db.Student.insertOne({
+  student_id: 5,
+  name: "Ethan",
+  age: 18,
+  gender: "Male",
+  marks: { math: 73, science: 82, english: 68 }
+})
+
+//-----------------------------------------
+// 4️⃣ Find all students who are male
+//-----------------------------------------
+db.Student.find({ gender: "Male" }).pretty()
+
+//-----------------------------------------
+// 5️⃣ Find students who scored more than 90 in math
+//-----------------------------------------
+db.Student.find({ "marks.math": { $gt: 90 } }).pretty()
+
+//-----------------------------------------
+// 6️⃣ Find students aged 20 and above
+//-----------------------------------------
+db.Student.find({ age: { $gte: 20 } }).pretty()
+
+//-----------------------------------------
+// 7️⃣ Find students whose English marks are between 80 and 90
+//-----------------------------------------
+db.Student.find({ "marks.english": { $gte: 80, $lte: 90 } }).pretty()
+
+//-----------------------------------------
+// 8️⃣ Count the number of female students
+//-----------------------------------------
+db.Student.countDocuments({ gender: "Female" })
+
+//-----------------------------------------
+// 9️⃣ Find the student with the highest science score
+//-----------------------------------------
+db.Student.find().sort({ "marks.science": -1 }).limit(1)
+
+//-----------------------------------------
+// 🔟 Update Bob’s math score to 75
+//-----------------------------------------
+db.Student.updateOne(
+  { name: "Bob" },
+  { $set: { "marks.math": 75 } }
+)
+
+//-----------------------------------------
+// 11️⃣ Delete all students who scored below 70 in math
+//-----------------------------------------
+db.Student.deleteMany({ "marks.math": { $lt: 70 } })
+
+//-----------------------------------------
+// 12️⃣ Use aggregation to find average marks in science for all students
+//-----------------------------------------
+db.Student.aggregate([
+  { $group: { _id: null, Average_Science_Marks: { $avg: "$marks.science" } } }
+])
+
+//-----------------------------------------
+// 13️⃣ Find number of students with marks greater than 80 in any subject
+//-----------------------------------------
+db.Student.find({
+  $or: [
+    { "marks.math": { $gt: 80 } },
+    { "marks.science": { $gt: 80 } },
+    { "marks.english": { $gt: 80 } }
+  ]
+}).count()
+
+//-----------------------------------------
+// ✅ Final check: Display remaining records
+//-----------------------------------------
+print("\nRemaining Students in Collection:\n")
+db.Student.find().pretty()

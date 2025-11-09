@@ -1,0 +1,77 @@
+SET SERVEROUTPUT ON;
+
+-- STEP 1: Drop old tables (optional, prevents duplicate errors)
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE Library_Audit';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE Library';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+-- STEP 2: Create Main Table
+CREATE TABLE Library (
+    Book_ID NUMBER PRIMARY KEY,
+    Book_Name VARCHAR2(100),
+    Author VARCHAR2(50),
+    Price NUMBER
+);
+
+-- STEP 3: Create Audit Table
+CREATE TABLE Library_Audit (
+    Audit_ID NUMBER GENERATED ALWAYS AS IDENTITY,
+    Book_ID NUMBER,
+    Book_Name VARCHAR2(100),
+    Author VARCHAR2(50),
+    Price NUMBER,
+    Operation_Type VARCHAR2(20),
+    Operation_Date DATE
+);
+
+-- STEP 4: Insert Sample Records
+INSERT INTO Library VALUES (1, 'DBMS Concepts', 'Navathe', 550);
+INSERT INTO Library VALUES (2, 'Operating System', 'Silberschatz', 600);
+INSERT INTO Library VALUES (3, 'Computer Networks', 'Tanenbaum', 700);
+COMMIT;
+
+-- STEP 5: Create Trigger to Track Updates & Deletes
+CREATE OR REPLACE TRIGGER trg_Library_Audit
+BEFORE UPDATE OR DELETE
+ON Library
+FOR EACH ROW
+BEGIN
+    IF UPDATING THEN
+        INSERT INTO Library_Audit (Book_ID, Book_Name, Author, Price, Operation_Type, Operation_Date)
+        VALUES (:OLD.Book_ID, :OLD.Book_Name, :OLD.Author, :OLD.Price, 'UPDATE', SYSDATE);
+        DBMS_OUTPUT.PUT_LINE('Old record of Book_ID ' || :OLD.Book_ID || ' saved to Library_Audit (UPDATE)');
+    ELSIF DELETING THEN
+        INSERT INTO Library_Audit (Book_ID, Book_Name, Author, Price, Operation_Type, Operation_Date)
+        VALUES (:OLD.Book_ID, :OLD.Book_Name, :OLD.Author, :OLD.Price, 'DELETE', SYSDATE);
+        DBMS_OUTPUT.PUT_LINE('Old record of Book_ID ' || :OLD.Book_ID || ' saved to Library_Audit (DELETE)');
+    END IF;
+END;
+/
+SHOW ERRORS;
+
+-- STEP 6: Test Trigger
+
+-- Update operation
+UPDATE Library
+SET Price = 650
+WHERE Book_ID = 1;
+
+-- Delete operation
+DELETE FROM Library
+WHERE Book_ID = 2;
+
+COMMIT;
+
+-- STEP 7: Display Results
+PROMPT ---- CURRENT LIBRARY TABLE ----
+SELECT * FROM Library;
+
+PROMPT ---- AUDIT TABLE RECORDS ----
+SELECT * FROM Library_Audit;

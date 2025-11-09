@@ -1,0 +1,82 @@
+// Use or create the database
+use CollegeDB;
+
+// Create the collection
+db.createCollection("Student");
+
+// Insert sample documents
+db.Student.insertMany([
+  {
+    student_id: 101,
+    name: "Alice",
+    age: 19,
+    gender: "Female",
+    marks: { math: 92, science: 88, english: 85 }
+  },
+  {
+    student_id: 102,
+    name: "Bob",
+    age: 21,
+    gender: "Male",
+    marks: { math: 70, science: 95, english: 78 }
+  },
+  {
+    student_id: 103,
+    name: "Neha",
+    age: 20,
+    gender: "Female",
+    marks: { math: 88, science: 80, english: 82 }
+  },
+  {
+    student_id: 104,
+    name: "Nikhil",
+    age: 22,
+    gender: "Male",
+    marks: { math: 95, science: 92, english: 90 }
+  },
+  {
+    student_id: 105,
+    name: "Ravi",
+    age: 18,
+    gender: "Male",
+    marks: { math: 65, science: 75, english: 60 }
+  }
+]);
+
+// 1️⃣ Find all students who are male
+db.Student.find({ gender: "Male" });
+
+// 2️⃣ Find students who scored more than 90 in math
+db.Student.find({ "marks.math": { $gt: 90 } });
+
+// 3️⃣ Find students aged 20 and above
+db.Student.find({ age: { $gte: 20 } });
+
+// 4️⃣ Find students whose English marks are between 80 and 90
+db.Student.find({ "marks.english": { $gte: 80, $lte: 90 } });
+
+// 5️⃣ Count number of female students
+db.Student.countDocuments({ gender: "Female" });
+
+// 6️⃣ Find student with highest science score
+db.Student.find().sort({ "marks.science": -1 }).limit(1);
+
+// 7️⃣ Update Bob’s math score to 75
+db.Student.updateOne({ name: "Bob" }, { $set: { "marks.math": 75 } });
+
+// 8️⃣ Delete all students who scored below 70 in math
+db.Student.deleteMany({ "marks.math": { $lt: 70 } });
+
+// 9️⃣ Find average marks in science for all students
+db.Student.aggregate([
+  { $group: { _id: null, avg_science: { $avg: "$marks.science" } } }
+]);
+
+// 🔟 Find number of students with marks greater than 80 in any subject
+db.Student.find({
+  $or: [
+    { "marks.math": { $gt: 80 } },
+    { "marks.science": { $gt: 80 } },
+    { "marks.english": { $gt: 80 } }
+  ]
+}).count();

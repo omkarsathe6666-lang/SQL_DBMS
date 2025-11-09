@@ -1,0 +1,99 @@
+//-----------------------------------------
+// 1️⃣ Use / Create Database
+//-----------------------------------------
+use Restaurants
+
+//-----------------------------------------
+// 2️⃣ Create Collection: REST1
+//-----------------------------------------
+db.createCollection("REST1")
+
+//-----------------------------------------
+// 3️⃣ Insert Sample Documents
+//-----------------------------------------
+db.REST1.insertOne({
+  restaurant_id: 3001,
+  name: "Spice Villa",
+  address: { building: "12A", street: "MG Road", city: "Pune", zipcode: "411001" },
+  cuisine_type: "Indian",
+  score: 78
+})
+
+db.REST1.insertOne({
+  restaurant_id: 3002,
+  name: "Tandoor Treat",
+  address: { building: "45B", street: "Link Road", city: "Mumbai", zipcode: "400067" },
+  cuisine_type: "Indian",
+  score: 95
+})
+
+db.REST1.insertOne({
+  restaurant_id: 3003,
+  name: "Sushi Bay",
+  address: { building: "33C", street: "FC Road", city: "Pune", zipcode: "411005" },
+  cuisine_type: "Japanese",
+  score: 82
+})
+
+db.REST1.insertOne({
+  restaurant_id: 3004,
+  name: "Burger Den",
+  address: { building: "22D", street: "JM Road", city: "Pune", zipcode: "411004" },
+  cuisine_type: "American",
+  score: 88
+})
+
+db.REST1.insertOne({
+  restaurant_id: 3005,
+  name: "Taj Spice",
+  address: { building: "55E", street: "Marine Drive", city: "Mumbai", zipcode: "400001" },
+  cuisine_type: "Indian",
+  score: 92
+})
+
+//-----------------------------------------
+// 4️⃣ Display all documents
+//-----------------------------------------
+db.REST1.find().pretty()
+
+//-----------------------------------------
+// 5️⃣ Display specific fields only (Exclude _id)
+//-----------------------------------------
+db.REST1.find({}, { _id: 0, restaurant_id: 1, name: 1, "address.city": 1, "address.zipcode": 1 })
+
+//-----------------------------------------
+// 6️⃣ Find restaurants with score > 80 and < 100
+//-----------------------------------------
+db.REST1.find({ score: { $gt: 80, $lt: 100 } }).pretty()
+
+//-----------------------------------------
+// 7️⃣ Update score of restaurant_id = 3001 to 90
+//-----------------------------------------
+db.REST1.updateOne(
+  { restaurant_id: 3001 },
+  { $set: { score: 90 } }
+)
+
+//-----------------------------------------
+// 8️⃣ Update cuisine_type of all Indian restaurants
+//-----------------------------------------
+db.REST1.updateMany(
+  { cuisine_type: "Indian" },
+  { $set: { cuisine_type: "Indian_Zatka" } }
+)
+
+//-----------------------------------------
+// 9️⃣ Delete restaurant with restaurant_id = 3003
+//-----------------------------------------
+db.REST1.deleteOne({ restaurant_id: 3003 })
+
+//-----------------------------------------
+// 🔟 Delete all restaurants with score less than 85
+//-----------------------------------------
+db.REST1.deleteMany({ score: { $lt: 85 } })
+
+//-----------------------------------------
+// ✅ Final Check: Display remaining restaurants
+//-----------------------------------------
+print("\nRemaining Restaurants in REST1:\n")
+db.REST1.find().pretty()
