@@ -1,0 +1,4 @@
+https://github.com/omkarsathe6666-lang/SQL_DBMS
+
+sqlplus / as sysdba
+alter user system identified __________;
